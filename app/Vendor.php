@@ -13,6 +13,6 @@ class Vendor extends Model
     }
 
     public function categories(){
-    	return $this->belongsToMany('App\Category','vendors_brands');
+    	return $this->belongsToMany('App\Category','vendors_categories');
     }
 }

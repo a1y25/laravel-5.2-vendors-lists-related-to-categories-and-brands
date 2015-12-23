@@ -2,20 +2,19 @@
 
 @section('content')
 	
-
 	<div class="container" id="app">
 		
 		<h1>Create a Vendor</h1>
 
 		<div class="form-group">
 		  <label for="">Name</label>
-		  <input type="text" class="form-control" name="name" v-model="name">
+		  <input type="text" class="form-control" name="name" v-model="name" value="{{$vendor->name}}">
 		</div>		
 
 
 		<div class="form-group">
 		  <label for="">Address</label>
-		  <input type="text" class="form-control" name="address" v-model="address">
+		  <input type="text" class="form-control" name="address" v-model="address" value="{{$vendor->address}}">
 		</div>		
 
 		<div class="form-group">
@@ -26,7 +25,7 @@
 		</select>
 		</div>
 
-		<div>
+		<div v-if="vendorBrands.length">
 			<h4>
 				<span v-for="vendorBrand in vendorBrands" class="label label-default">
 				@{{vendorBrand.title}} 
@@ -39,12 +38,12 @@
 		  <label for="">Categories</label>
 		  <select id="categories-select" class="form-control" name="">
 			<option></option>
-			<option v-for="category in categories">@{{category.title}}</option>
+			<option v-for="category in categories" value="@{{category.id}}">@{{category.title}}</option>
 		  </select>
 		</div>
 
 
-		<div>
+		<div v-if="vendorCategories.length">
 			<h4>
 				<span v-for="vendorCategory in vendorCategories" class="label label-default">
 				@{{vendorCategory.title}} 
@@ -53,7 +52,7 @@
 			</h4>
 		</div>
 	
-		<button @click="createVendor" class="btn btn-sm btn-info">Create</button>
+		<button @click="updateVendor" class="btn btn-sm btn-info">Update</button>
 	</div>
 	
 
@@ -83,7 +82,6 @@
 
 		categorySelect.on('select2:select',function (e){
 			var data = e.params.data;
-
 			var duplicate = VendorApp.vendorCategories.filter(function (brand){
 				return brand.id===data.id;
 			});	
@@ -99,8 +97,8 @@
 		 	data: {
   			  brands: [],
   			  categories: [],
-  			  vendorBrands: [],
-  			  vendorCategories:[]
+  			  vendorBrands: {!! $vendor->brands !!},
+  			  vendorCategories:{!! $vendor->categories !!}
 		  	},
 		 	methods:{
 		 		removeVendor(brand){
@@ -109,30 +107,27 @@
 		 		removeCategory(category){
 		 			this.vendorCategories.$remove(category);
 		 		},
-		 		createVendor(){
+		 		updateVendor(){
 
 		 			var data = {
 		 				name: this.name,
-		 				address: this.name,
+		 				address: this.address,
 		 				brands: this.vendorBrands.map(function (brand){return brand.id;}),
 		 				categories: this.vendorCategories.map(function (category){return category.id})
 		 			};
 
-		 			this.$http.post('/api/vendor', data).then(function (){
-
-		 				alert('vendor created success.')
+		 			this.$http.put('/api/vendor/{{$vendor->id}}', data).then(function (){
+		 				alert('Vendor Updated Successfully...');
 
 		 			},function (){
-		 				alert('cannot insert data.');
+		 				alert('cannot update data.');
 		 			});
 
 		 		},
 		 		fetchBrands(){
-
 		 			this.$http.get('/api/brands').then(function (response){
 		 				this.brands = response.data;
 		 			});
-
 		 		},
 
 		 		fetchCategories(){
